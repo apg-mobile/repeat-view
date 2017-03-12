@@ -78,9 +78,9 @@ public class RepeatView extends View {
 
         if (scaleDirection == SCALE_DIRECTION_HEIGHT) {
             desiredWidth = bitmapDrawable.getIntrinsicWidth();
-            desiredHeight = Math.min(parent.getMeasuredHeight(), viewHeight);
+            desiredHeight = parent.getMeasuredHeight();
         } else if (scaleDirection == SCALE_DIRECTION_WIDTH) {
-            desiredWidth = Math.min(parent.getMeasuredWidth(), viewWidth);
+            desiredWidth = parent.getMeasuredWidth();
             desiredHeight = bitmapDrawable.getIntrinsicHeight();
         } else {
             desiredWidth = viewWidth;
