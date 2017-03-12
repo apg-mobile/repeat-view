@@ -17,11 +17,15 @@ public class RepeatView extends View {
 
     private static final int SCALE_TYPE_EXPAND = 0;
     private static final int SCALE_TYPE_SCALE_DOWN = 1;
+    private static final int SCALE_DIRECTION_HEIGHT = 0;
+    private static final int SCALE_DIRECTION_WIDTH = 1;
+    private static final int SCALE_DIRECTION_BOTH = 2;
 
     private BitmapDrawable bitmapDrawable;
     private int scaleType;
     private int mPreviewWidth;
     private int mPreviewHeight;
+    private int scaleDirection;
 
     public RepeatView(Context context) {
         super(context);
@@ -48,6 +52,7 @@ public class RepeatView extends View {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RepeatView);
         Drawable repeatDrawable = a.getDrawable(R.styleable.RepeatView_src);
         scaleType = a.getInt(R.styleable.RepeatView_scaleType, SCALE_TYPE_EXPAND);
+        scaleDirection = a.getInt(R.styleable.RepeatView_scaleDirection, SCALE_DIRECTION_HEIGHT);
 
         if (repeatDrawable == null)
             throw new NullPointerException("You have to set src first..");
@@ -63,10 +68,24 @@ public class RepeatView extends View {
         int wm, hm;
         int viewHeightMode = MeasureSpec.getMode(heightMeasureSpec);
         int viewWidthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int viewWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int viewHeight = MeasureSpec.getSize(widthMeasureSpec);
+        View parent = (View) getParent();
 
         // 1: find user desired dimension
-        int desiredWidth = measureDesiredSize(widthMeasureSpec, bitmapDrawable.getIntrinsicWidth());
-        int desiredHeight = measureDesiredSize(heightMeasureSpec, bitmapDrawable.getIntrinsicHeight());
+        int desiredWidth;
+        int desiredHeight;
+
+        if (scaleDirection == SCALE_DIRECTION_HEIGHT) {
+            desiredWidth = bitmapDrawable.getIntrinsicWidth();
+            desiredHeight = Math.min(parent.getMeasuredHeight(), viewHeight);
+        } else if (scaleDirection == SCALE_DIRECTION_WIDTH) {
+            desiredWidth = Math.min(parent.getMeasuredWidth(), viewWidth);
+            desiredHeight = bitmapDrawable.getIntrinsicHeight();
+        } else {
+            desiredWidth = viewWidth;
+            desiredHeight = viewHeight;
+        }
 
         // 2:expand_mode -> adjust view
         if (scaleType == SCALE_TYPE_EXPAND) {
@@ -93,29 +112,22 @@ public class RepeatView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        bitmapDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-        bitmapDrawable.draw(canvas);
+        if (isInEditMode()) {
+            bitmapDrawable.setBounds(0, 0, mPreviewWidth, mPreviewHeight);
+            bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+            bitmapDrawable.draw(canvas);
+        } else {
+            bitmapDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+            bitmapDrawable.draw(canvas);
+        }
+
     }
 
     private int updateSizeByExpandMode(int desiredSize, int imageSize) {
         if (desiredSize > imageSize) {
             int item = (int) Math.ceil(desiredSize / (float) imageSize);
             return item * imageSize;
-        } else {
-            return imageSize;
-        }
-    }
-
-    private int measureDesiredSize(int measureSpec, int imageSize) {
-
-        int mode = MeasureSpec.getMode(measureSpec);
-        int size = MeasureSpec.getSize(measureSpec);
-
-        if (mode == MeasureSpec.EXACTLY) {
-            return size;
-        } else if (mode == MeasureSpec.AT_MOST) {
-            return Math.min(size, imageSize);
         } else {
             return imageSize;
         }

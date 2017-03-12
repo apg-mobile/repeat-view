@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.apg.mobile.repeatlayout.MainActivity">
-
-    <com.apg.mobile.repeatview.RepeatView
-        android:id="@+id/aa"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="0dp"
-        android:background="@color/colorPrimary"
-        android:padding="30dp"
-        app:scaleType="expand"
-        app:src="@drawable/repeatview_samplebg" />
+    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_toEndOf="@+id/aa"
-        android:background="@drawable/repeat" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+        <com.apg.mobile.repeatview.RepeatView
+            android:id="@+id/aa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:background="@color/colorPrimary"
+            android:padding="30dp"
+            app:scaleDirection="height"
+            app:scaleType="expand"
+            app:src="@drawable/repeatview_samplebg" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/colorAccent" />
+
+    </LinearLayout>
+    
 </RelativeLayout>
